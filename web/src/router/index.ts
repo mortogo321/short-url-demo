@@ -43,7 +43,7 @@ const router = createRouter({
 })
 
 // Navigation guards
-router.beforeEach(async (to, from, next) => {
+router.beforeEach(async (to) => {
   const authStore = useAuthStore()
 
   // Initialize auth state if not already done
@@ -57,23 +57,18 @@ router.beforeEach(async (to, from, next) => {
 
   // Check if route requires authentication
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
-    next({ name: 'login', query: { redirect: to.fullPath } })
-    return
+    return { name: 'login', query: { redirect: to.fullPath } }
   }
 
   // Check if route is guest only (login/register)
   if (to.meta.guestOnly && authStore.isAuthenticated) {
-    next({ name: 'dashboard' })
-    return
+    return { name: 'dashboard' }
   }
 
   // Check if route requires admin privileges
   if (to.meta.requiresAdmin && !authStore.isAdmin) {
-    next({ name: 'dashboard' })
-    return
+    return { name: 'dashboard' }
   }
-
-  next()
 })
 
 export default router
